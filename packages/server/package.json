@@ -18,5 +18,11 @@
     "eslint-config-xo-typescript": "^1.0.1",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@cliqz/adblocker": "^1.26.12",
+    "@fastify/type-provider-typebox": "^3.5.0",
+    "@sinclair/typebox": "^0.31.28",
+    "fastify": "^4.25.1"
   }
 }
