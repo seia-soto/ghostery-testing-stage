@@ -25,11 +25,9 @@ export const getFiltersFromTrackerDefinitions = (definitions: TrackerDbSource['d
 	let contents = '';
 
 	for (const [filename, filters] of definitions.entries()) {
-		if (filters) {
-			contents += `! ${filename}
+		contents += `! ${filename}
 ${filters}
 `;
-		}
 	}
 
 	return contents;

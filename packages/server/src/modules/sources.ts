@@ -42,16 +42,17 @@ export const getTrackerDbSource = async (opt: string) => {
 		definitions: new Map(),
 	};
 
-	const files = await treeFiles(dir);
+	const files = (await treeFiles(dir)).filter(file => file.endsWith('.eno'));
 	const filters = await Promise.all(
 		files
-			.filter(file => file.endsWith('.eno'))
 			.map(async file => getFiltersSectionFromTrackerDbDefinition((await readFile(file, 'utf8')))),
 	);
 
 	for (let i = 0; i < files.length; i++) {
 		source.definitions.set(files[i], filters[i]);
 	}
+
+	console.log(`sources: loaded ${files.length} trackerdb definitions`);
 
 	source.filters = getFiltersFromTrackerDefinitions(source.definitions);
 
