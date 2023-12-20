@@ -8,6 +8,7 @@ export const configSchema = Type.Object({
 		port: Type.String({format: numeric}),
 	}),
 	sources: Type.String(),
+	watch: Type.String(),
 });
 
 export type Config = Static<typeof configSchema>;
@@ -25,6 +26,7 @@ export const getConfigFromEnv = () => ({
 		port: process.env.BIND_PORT ?? '8122',
 	},
 	sources: process.env.SOURCES ?? '',
+	watch: process.env.WATCH ?? '',
 });
 
 /**

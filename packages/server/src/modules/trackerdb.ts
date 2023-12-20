@@ -26,11 +26,15 @@ export const getFiltersSectionFromTrackerDefinition = (text: string) => {
 export const getFiltersFromTrackerDefinitions = (definitions: TrackerDbSource['definitions']) => {
 	let contents = '';
 
+	console.time('trackerdb: build filters');
+
 	for (const [filename, filters] of definitions.entries()) {
 		contents += `! ${filename}
 ${filters}
 `;
 	}
+
+	console.timeEnd('trackerdb: build filters');
 
 	return contents;
 };
