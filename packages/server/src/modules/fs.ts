@@ -15,7 +15,7 @@ export const treeFiles = async (root: string) => {
 		}
 
 		// eslint-disable-next-line no-await-in-loop
-		const list = await readdir(root);
+		const list = await readdir(dir);
 
 		for (const item of list) {
 			const fullpath = path.join(dir, item);
