@@ -76,7 +76,7 @@ trackerdb://path
 - default: (empty)
 
 The server will watch local sources if the variable has a length.
-For example, this value will be evaluated to `false` if you leave this variable empty.z
+For example, this value will be evaluated to `false` if you leave this variable empty.
 
 ## API
 
