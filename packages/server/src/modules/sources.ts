@@ -1,4 +1,5 @@
 import {readFile} from 'fs/promises';
+import path from 'path';
 import {type Config} from './config';
 import {isDirectory, treeFiles} from './fs';
 import {getFiltersSectionFromTrackerDbDefinition} from './trackerdb';
@@ -26,15 +27,17 @@ export type Source = TrackerDbSource;
  * @param opt The path to TrackerDB
  */
 export const getTrackerDbSource = async (opt: string) => {
-	if (!await isDirectory(opt)) {
-		console.error('sources(trackerdb): invalid path to the directory', opt);
+	const dir = path.join(process.cwd(), opt);
+
+	if (!await isDirectory(dir)) {
+		console.error('sources(trackerdb): invalid path to the directory', dir);
 
 		throw new Error('Failed to validate TrackerDB path!');
 	}
 
 	const source: TrackerDbSource = {
 		type: SourceType.TrackerDb,
-		path: opt,
+		path: dir,
 		filters: '',
 		definitions: new Map(),
 	};
@@ -51,7 +54,7 @@ export const getTrackerDbSource = async (opt: string) => {
 		},
 	});
 
-	const files = await treeFiles(opt);
+	const files = await treeFiles(dir);
 	const filters = await Promise.all(files.map(async file => getFiltersSectionFromTrackerDbDefinition((await readFile(file, 'utf8')))));
 
 	for (let i = 0; i < files.length; i++) {
