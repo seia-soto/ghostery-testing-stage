@@ -34,6 +34,8 @@ export const getConfigFromEnv = () => ({
 export const getConfig = (obj = getConfigFromEnv()): Config => {
 	// eslint-disable-next-line new-cap
 	if (checker.Check(obj)) {
+		console.log('config: loaded', JSON.stringify(obj));
+
 		return obj;
 	}
 
