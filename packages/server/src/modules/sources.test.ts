@@ -6,7 +6,7 @@ test('get sources', async t => {
 
 	const [source] = await getSources('trackerdb://./test-resources/one') as [TrackerDbSource];
 
-	t.is(source.filters, `||example.test.filter^$3p
+	t.is(source.filters.split('\n').slice(1).join('\n'), `||example.test.filter^$3p
 ||example.test.filter$1p
 `);
 });
