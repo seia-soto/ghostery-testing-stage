@@ -2,7 +2,7 @@ import {readFile} from 'fs/promises';
 import path from 'path';
 import {type Config} from './config';
 import {isDirectory, treeFiles} from './fs';
-import {getFiltersFromTrackerDefinitions, getFiltersSectionFromTrackerDbDefinition} from './trackerdb';
+import {getFiltersFromTrackerDefinitions, getFiltersSectionFromTrackerDefinition, isTrackerDefinition} from './trackerdb';
 
 // Leave this as enum value so we can extend this function later on.
 export enum SourceType {
@@ -42,10 +42,10 @@ export const getTrackerDbSource = async (opt: string) => {
 		definitions: new Map(),
 	};
 
-	const files = (await treeFiles(dir)).filter(file => file.endsWith('.eno'));
+	const files = (await treeFiles(dir)).filter(isTrackerDefinition);
 	const filters = await Promise.all(
 		files
-			.map(async file => getFiltersSectionFromTrackerDbDefinition((await readFile(file, 'utf8')))),
+			.map(async file => getFiltersSectionFromTrackerDefinition((await readFile(file, 'utf8')))),
 	);
 
 	for (let i = 0; i < files.length; i++) {

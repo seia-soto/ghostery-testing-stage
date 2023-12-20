@@ -1,8 +1,10 @@
 import {type TrackerDbSource} from './sources';
 
+export const isTrackerDefinition = (filename: string) => filename.endsWith('.eno');
+
 const delimiter = '--- filters';
 
-export const getFiltersSectionFromTrackerDbDefinition = (text: string) => {
+export const getFiltersSectionFromTrackerDefinition = (text: string) => {
 	const start = text.indexOf(delimiter);
 
 	if (start < 0) {
