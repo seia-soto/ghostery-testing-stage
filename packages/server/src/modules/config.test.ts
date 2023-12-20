@@ -9,5 +9,6 @@ test('validate config', async t => {
 			port: 'NaN',
 		},
 		sources: '',
+		watch: '',
 	}));
 });
