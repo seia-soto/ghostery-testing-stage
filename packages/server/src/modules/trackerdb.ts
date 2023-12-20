@@ -1,18 +1,20 @@
 const delimiter = '--- filters';
 
-export const getFiltersSectionFromTrackerDbDefinition = async (text: string) => {
+export const getFiltersSectionFromTrackerDbDefinition = (text: string) => {
 	const start = text.indexOf(delimiter);
 
 	if (start < 0) {
 		return '';
 	}
 
-	const end = text.indexOf(delimiter, start + 1);
+	const actualStart = start + 12; /* Delimiter.length + 1 */
+	const end = text.indexOf(delimiter, actualStart);
 
 	if (end < 0) {
-		// Invalid eno file
+		// Invalid file format
 		return '';
 	}
 
-	return text.slice(start + 12 /* delimiter.length + 1 */, end);
+	// Avoid including additional line break
+	return text.slice(actualStart, end - 1);
 };
