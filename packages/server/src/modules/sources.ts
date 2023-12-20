@@ -2,7 +2,7 @@ import {readFile} from 'fs/promises';
 import path from 'path';
 import {type Config} from './config';
 import {isDirectory, treeFiles} from './fs';
-import {getFiltersSectionFromTrackerDbDefinition} from './trackerdb';
+import {getFiltersFromTrackerDefinitions, getFiltersSectionFromTrackerDbDefinition} from './trackerdb';
 
 // Leave this as enum value so we can extend this function later on.
 export enum SourceType {
@@ -27,7 +27,7 @@ export type Source = TrackerDbSource;
  * @param opt The path to TrackerDB
  */
 export const getTrackerDbSource = async (opt: string) => {
-	const dir = path.join(process.cwd(), opt);
+	const dir = opt.startsWith('/') ? opt : path.join(process.cwd(), opt);
 
 	if (!await isDirectory(dir)) {
 		console.error('sources(trackerdb): invalid path to the directory', dir);
@@ -42,24 +42,18 @@ export const getTrackerDbSource = async (opt: string) => {
 		definitions: new Map(),
 	};
 
-	Object.defineProperty(source, 'filters', {
-		get() {
-			let filters = '';
-
-			for (const entry of source.definitions.entries()) {
-				filters += entry[1] + '\n';
-			}
-
-			return filters;
-		},
-	});
-
 	const files = await treeFiles(dir);
-	const filters = await Promise.all(files.map(async file => getFiltersSectionFromTrackerDbDefinition((await readFile(file, 'utf8')))));
+	const filters = await Promise.all(
+		files
+			.filter(file => file.endsWith('.eno'))
+			.map(async file => getFiltersSectionFromTrackerDbDefinition((await readFile(file, 'utf8')))),
+	);
 
 	for (let i = 0; i < files.length; i++) {
 		source.definitions.set(files[i], filters[i]);
 	}
+
+	source.filters = getFiltersFromTrackerDefinitions(source.definitions);
 
 	return source;
 };

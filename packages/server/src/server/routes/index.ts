@@ -8,4 +8,20 @@ export const router: FastifyPluginAsync = async server => {
 			return 'healty';
 		},
 	});
+
+	server.route({
+		url: '/engine.bytes',
+		method: 'get',
+		handler() {
+			return server.engineManager.engine.serialize();
+		},
+	});
+
+	server.route({
+		url: '/filters.txt',
+		method: 'get',
+		handler() {
+			return server.engineManager.sources.map(source => source.filters).join('\n');
+		},
+	});
 };

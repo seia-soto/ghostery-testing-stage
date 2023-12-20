@@ -20,6 +20,9 @@ importers:
       fastify:
         specifier: ^4.25.1
         version: 4.25.1
+      fastify-plugin:
+        specifier: ^4.5.1
+        version: 4.5.1
     devDependencies:
       '@types/node':
         specifier: ^20.10.5
@@ -1359,6 +1362,10 @@ packages:
 
   /fast-uri@2.3.0:
     resolution: {integrity: sha512-eel5UKGn369gGEWOqBShmFJWfq/xSJvsgDzgLYC845GneayWvXBf0lJCBn5qTABfewy1ZDPoaR5OZCP+kssfuw==}
+    dev: false
+
+  /fastify-plugin@4.5.1:
+    resolution: {integrity: sha512-stRHYGeuqpEZTL1Ef0Ovr2ltazUT9g844X5z/zEBFLG8RYlpDiOCIG+ATvYEp+/zmc7sN29mcIMp8gvYplYPIQ==}
     dev: false
 
   /fastify@4.25.1:

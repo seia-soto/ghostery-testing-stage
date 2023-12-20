@@ -1,3 +1,5 @@
+import {type TrackerDbSource} from './sources';
+
 const delimiter = '--- filters';
 
 export const getFiltersSectionFromTrackerDbDefinition = (text: string) => {
@@ -17,4 +19,18 @@ export const getFiltersSectionFromTrackerDbDefinition = (text: string) => {
 
 	// Avoid including additional line break
 	return text.slice(actualStart, end - 1);
+};
+
+export const getFiltersFromTrackerDefinitions = (definitions: TrackerDbSource['definitions']) => {
+	let contents = '';
+
+	for (const [filename, filters] of definitions.entries()) {
+		if (filters) {
+			contents += `! ${filename}
+${filters}
+`;
+		}
+	}
+
+	return contents;
 };

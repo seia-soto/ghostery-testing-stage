@@ -1,10 +1,15 @@
 import {type FastifyPluginAsync} from 'fastify';
+import fastifyPlugin from 'fastify-plugin';
 import {getConfig} from '../modules/config';
 
-export const configPlugin: FastifyPluginAsync = async server => {
+const plugin: FastifyPluginAsync = async server => {
 	if (server.hasDecorator('config')) {
 		return;
 	}
 
-	server.decorate('config', getConfig());
+	const config = getConfig();
+
+	server.decorate('config', config);
 };
+
+export const configPlugin = fastifyPlugin(plugin);
