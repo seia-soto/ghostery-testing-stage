@@ -8,6 +8,7 @@
   },
   "scripts": {
     "start": "NODE_OPTIONS='--import=tsx' node ./src/index.ts",
+    "start:watch": "NODE_OPTIONS='--import=tsx' WATCH='true' node ./src/index.ts",
     "test": "NODE_OPTIONS='--import=tsx' ava"
   },
   "ava": {
