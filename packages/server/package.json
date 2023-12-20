@@ -1,7 +1,7 @@
 {
   "name": "@testing-stage/server",
   "version": "0.0.1",
-  "main": "out/index.js",
+  "main": "src/bin.ts",
   "type": "module",
   "engines": {
     "node": ">=20.10.0"
