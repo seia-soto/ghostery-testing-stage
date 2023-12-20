@@ -1,4 +1,4 @@
-import {readFile, readdir, stat} from 'fs/promises';
+import {readdir, stat} from 'fs/promises';
 import path from 'path';
 
 export const isDirectory = async (dir: string) => (await stat(dir)).isDirectory();

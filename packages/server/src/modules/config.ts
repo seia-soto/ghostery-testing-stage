@@ -41,7 +41,7 @@ export const getConfig = (obj = getConfigFromEnv()): Config => {
 	const errors = checker.Errors(obj);
 
 	for (const error of errors) {
-		console.error(`config: ${error.message} at ${error.path} but got`, error.value);
+		console.error(`config: ${error.message} at ${error.path} but saw`, error.value);
 	}
 
 	throw new Error('Failed to validate config object!');
