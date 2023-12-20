@@ -9,20 +9,34 @@
 Configuration of server can be done using environment variables.
 Please, see `src/modules/config.ts` file to know what environment variables are used.
 
-**Binding to specific address**
+## Binding to specific address (`BIND_ADDRESS` and `BIND_PORT`)
 
-To bind at specific address:
+`BIND_ADDRESS` and `BIND_PORT` decides the host and port for application to bind on.
+By default the server will listen on `127.0.0.1:8122`.
 
-```sh
-export BIND_ADDRESS="127.0.0.1"
-export BIND_PORT="8122"
+## Registering sources (`SOURCES`)
+
+`SOURCES` are comma-spread urls describing the location of TrackerDB and filter lists.
+
+```
+<protocol>://<location>[,...]
 ```
 
-**Specify the location of TrackerDB or filter lists**
+Currently the following types of sources are supported:
+
+- TrackerDB: `trackerdb://path`
 
 ```sh
-export SOURCES="trackerdb:///absolute/path/to/trackerdb"
-export SOURCES="trackerdb://./relative/path/to/trackerdb"
+export SOURCES="trackerdb://path/to/trackerdb"
+```
+
+## Watching file changes (`WATCH`)
+
+The server supports watching changes on the TrackerDB directory.
+To enable watching, you can set `WATCH` environment variable to non-empty value:
+
+```sh
+export WATCH="true"
 ```
 
 # API
