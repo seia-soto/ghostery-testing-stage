@@ -21,7 +21,11 @@ export const router: FastifyPluginAsync = async server => {
 		url: '/filters.txt',
 		method: 'get',
 		handler() {
-			return server.engineManager.sources.map(source => source.filters).join('\n');
+			return `! Title: @ghostery/testing-stage
+! Expires: 1 hour
+! Version: ${Date.now()}
+
+${server.engineManager.sources.map(source => source.filters).join('\n')}`;
 		},
 	});
 };
