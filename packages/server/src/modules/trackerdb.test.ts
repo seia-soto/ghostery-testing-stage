@@ -1,25 +1,12 @@
 import test from 'ava';
+import {readFile} from 'fs/promises';
+import path from 'path';
 import {getFiltersSectionFromTrackerDbDefinition} from './trackerdb';
 
-const sample = `
-name: Example
-category: unknown
-website_url: http://example.org
-organization: example
-
---- domains
-example.org
---- domains
-
---- filters
-||example.test.filter^$3p
-||example.test.filter$1p
---- filters
-
-ghostery_id: 000`;
-
 test('get filters section from trackerdb definition', async t => {
-	const actual = getFiltersSectionFromTrackerDbDefinition(sample);
+	const file = await readFile(path.join(process.cwd(), 'test-resources/one/example.eno'), 'utf8');
+
+	const actual = getFiltersSectionFromTrackerDbDefinition(file);
 	const expected = `||example.test.filter^$3p
 ||example.test.filter$1p`;
 
