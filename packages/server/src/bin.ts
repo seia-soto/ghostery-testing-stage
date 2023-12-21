@@ -19,12 +19,12 @@ const args = <T extends Options>(options: T) => {
 const help = <T extends Options>(options: T) => {
 	const entries = Object.entries(options);
 
-	const padMultiple = 8;
+	const padMultiple = 4;
 	const padSize = Math.ceil(entries.reduce<number>((state, entry) => {
-		let len = entry[0].length + entry[1].short.length + '-, --'.length;
+		let len = entry[0].length + entry[1].short.length + 5; /* '-, --'.length */
 
 		if (entry[1].type === 'string' && entry[1].name) {
-			len += entry[1].name.length;
+			len += entry[1].name.length + 3; /* ' <>'.length */
 		}
 
 		if (len > state) {
@@ -37,7 +37,21 @@ const help = <T extends Options>(options: T) => {
 	const message = {
 		command: process.argv0,
 		options: entries
-			.map(([long, option]) => `-${option.short}, --${long}`.padEnd(padSize, ' ') + (option.description ?? ''))
+			.map(([long, option]) => {
+				let message = `-${option.short}, --${long}`;
+
+				if (option.type === 'string' && option.name) {
+					message += ` <${option.name}>`;
+				}
+
+				message = message.padEnd(padSize, ' ');
+
+				if (option.description) {
+					message += option.description;
+				}
+
+				return message;
+			})
 			.join('\n  '),
 	};
 
