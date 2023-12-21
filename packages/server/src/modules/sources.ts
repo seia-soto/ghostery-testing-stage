@@ -4,6 +4,8 @@ import path from 'path';
 import {type Config} from './config';
 import {isDirectory, treeFiles} from './fs';
 import {getFiltersFromTrackerDefinitions, getFiltersSectionFromTrackerDefinition, isTrackerDefinition} from './trackerdb';
+import {getBuffer} from './request';
+import {FiltersEngine} from '@cliqz/adblocker';
 
 // Leave this as enum value so we can extend this function later on.
 export enum SourceType {
@@ -66,25 +68,89 @@ export const getTrackerDbSource = async (opt: string) => {
 	return source;
 };
 
-export const getFilterListSource = async (opt: string) => {
+export const getFilterListSource = async (url: string) => {
+	console.log(`sources: loading filter list path=${url}`);
+
 	const source: FilterListSource = {
 		type: SourceType.FilterList,
 		filters: '',
-		url: opt,
+		url,
 	};
 
-	const response = await got(opt, {
-		headers: {
-			'user-agent': '@ghostery/testing-stage',
-		},
-		followRedirect: true,
-	});
+	const response = await got(url);
 
 	source.filters = response.body;
 
-	console.log(`sources: loaded filter list path=${opt}`);
+	return source;
+};
+
+export const getGhosteryEngineSource = async (url: string) => {
+	console.log(`sources: loading Ghostery engine path=${url}`);
+
+	const source: FilterListSource = {
+		type: SourceType.FilterList,
+		filters: '',
+		url,
+	};
+
+	const buffer = await getBuffer(url);
+	const engine = FiltersEngine.deserialize(buffer);
+	const filters = engine.getFilters();
+
+	for (const {rawLine} of filters.cosmeticFilters) {
+		source.filters += rawLine + '\n';
+	}
+
+	for (const {rawLine} of filters.networkFilters) {
+		source.filters += rawLine + '\n';
+	}
 
 	return source;
+};
+
+export type GhosteryEngine = {
+	url: string;
+	checksum: string;
+};
+
+export type GhosteryList = {
+	url: string;
+	checksum: string;
+	diffs: Record<string, string>;
+};
+
+export type GhosteryResources = {
+	name: string;
+	engines: Record<string, GhosteryEngine>;
+	lists: Record<string, GhosteryList>;
+};
+
+export const getGhosteryList = async (url: string) => {
+	console.log(`sources: loading Ghostery resources path=${url}`);
+
+	const response = await got(url);
+	const data = JSON.parse(response.body) as GhosteryResources;
+
+	const sources: Source[] = [];
+
+	const latestVersion = Object.keys(data.engines).reduce((state, version) => {
+		const versionNumber = parseInt(version, 10);
+
+		if (versionNumber > state) {
+			return versionNumber;
+		}
+
+		return state;
+	}, 0);
+
+	sources.push(await getGhosteryEngineSource(data.engines[latestVersion.toString()].url));
+
+	for (const [, {url}] of Object.entries(data.lists)) {
+		// eslint-disable-next-line no-await-in-loop
+		sources.push(await getFilterListSource(url));
+	}
+
+	return sources;
 };
 
 /**
@@ -104,12 +170,39 @@ export const getSources = async (text: Config['sources'], delimiter = ','): Prom
 		const protocol = line.slice(0, protocolEndsAt);
 		const opt = line.slice(protocolEndsAt + 3 /* '://'.length */);
 
-		if (protocol === 'trackerdb') {
-			// eslint-disable-next-line no-await-in-loop
-			sources.push(await getTrackerDbSource(opt));
-		} else if (protocol === 'http' || protocol === 'https') {
-			// eslint-disable-next-line no-await-in-loop
-			sources.push(await getFilterListSource(opt));
+		// eslint-disable-next-line default-case
+		switch (protocol) {
+			case 'db':
+			case 'trackerdb': {
+				// eslint-disable-next-line no-await-in-loop
+				sources.push(await getTrackerDbSource(opt));
+
+				break;
+			}
+
+			case 'http':
+			case 'https': {
+				// eslint-disable-next-line no-await-in-loop
+				sources.push(await getFilterListSource('http://' + opt));
+
+				break;
+			}
+
+			case 'adblocker':
+			case 'engine':
+			case 'ghostery': {
+				// eslint-disable-next-line no-await-in-loop
+				sources.push(await getGhosteryEngineSource('http://' + opt));
+
+				break;
+			}
+
+			case 'list': {
+				// eslint-disable-next-line no-await-in-loop
+				sources.push(...await getGhosteryList('http://' + opt));
+
+				break;
+			}
 		}
 	}
 

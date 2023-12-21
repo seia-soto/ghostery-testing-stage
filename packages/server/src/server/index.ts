@@ -5,7 +5,9 @@ import {engineManagerPlugin} from '../plugins/engine-manager';
 import {router} from './routes';
 
 export const createServer = async () => {
-	const server = fastify()
+	const server = fastify({
+		pluginTimeout: 0,
+	})
 		.setValidatorCompiler(TypeBoxValidatorCompiler);
 
 	await server.register(configPlugin);

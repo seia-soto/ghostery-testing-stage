@@ -64,10 +64,12 @@ Sets the port for application to bind on.
 Sets the sources to build.
 You can specify supported sources in URL schema.
 
-| Type        | Protocol    | Example                         | Watch mode    |
-|-------------|-------------|---------------------------------|---------------|
-| TrackerDB   | trackerdb   | `trackerdb://path/to/trackerdb` | ✅ Supported   |
-| Filter list | http, https | `https://domain.tld/filter.txt` | ❌ Unsupported |
+| Type          | Protocol                    | Example                            | Watch mode    |
+|---------------|-----------------------------|------------------------------------|---------------|
+| TrackerDB     | db, trackerdb               | `trackerdb://path/to/trackerdb`    | ✅ Supported   |
+| Filter list   | http, https                 | `https://domain.tld/filter.txt`    | ❌ Unsupported |
+| Engine bytes  | adblocker, engine, ghostery | `engine://domain.tld/engine.bytes` | ❌ Unsupported |
+| Resource list | list                        | `list://domain.tld/resources.list` | ❌ Unsupported |
 
 **WATCH**
 

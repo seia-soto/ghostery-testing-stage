@@ -92,6 +92,11 @@ const options: Options = {
 		name: 'port',
 		description: 'Port to bind on (default: 8122, format: numeric)',
 	},
+	sources: {
+		type: 'string',
+		short: 's',
+		description: 'Source list to use',
+	},
 };
 const values = args(options);
 
@@ -102,15 +107,18 @@ if (values.help) {
 }
 
 const put = <T>(key: string, value: T | undefined, replacer: ((value: T) => string) = (value => value as string)) => {
-	if (value) {
-		process.env[key] = replacer(value);
+	if (!value) {
+		return;
 	}
+
+	process.env[key] = replacer(value);
 };
 
 put('BIND_ADDRESS', values.host);
 put('BIND_PORT', values.port);
 put('WATCH', values.watch, _ => 'true');
 put('SOURCES', values.db, value => `trackerdb://${value}`);
+put('SOURCES', values.sources);
 
 (async () => {
 	const server = await createServer();
