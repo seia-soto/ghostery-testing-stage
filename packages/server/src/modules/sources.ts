@@ -1,4 +1,5 @@
 import {readFile} from 'fs/promises';
+import got from 'got';
 import path from 'path';
 import {type Config} from './config';
 import {isDirectory, treeFiles} from './fs';
@@ -6,7 +7,8 @@ import {getFiltersFromTrackerDefinitions, getFiltersSectionFromTrackerDefinition
 
 // Leave this as enum value so we can extend this function later on.
 export enum SourceType {
-	TrackerDb = 'trackerdb',
+	TrackerDb,
+	FilterList,
 }
 
 export type BaseSource = {
@@ -20,7 +22,12 @@ export type TrackerDbSource = BaseSource & {
 	definitions: Map<string, string>;
 };
 
-export type Source = TrackerDbSource;
+export type FilterListSource = BaseSource & {
+	type: SourceType.FilterList;
+	url: string;
+};
+
+export type Source = TrackerDbSource | FilterListSource;
 
 /**
  * Read filters from TrackerDB source
@@ -28,6 +35,8 @@ export type Source = TrackerDbSource;
  */
 export const getTrackerDbSource = async (opt: string) => {
 	const dir = opt.startsWith('/') ? opt : path.join(process.cwd(), opt);
+
+	console.log(`sources: loading trackerdb path=${dir}`);
 
 	if (!await isDirectory(dir)) {
 		console.error('sources(trackerdb): invalid path to the directory', dir);
@@ -52,9 +61,28 @@ export const getTrackerDbSource = async (opt: string) => {
 		source.definitions.set(files[i], filters[i]);
 	}
 
-	console.log(`sources: loaded ${files.length} trackerdb definitions`);
-
 	source.filters = getFiltersFromTrackerDefinitions(source.definitions);
+
+	return source;
+};
+
+export const getFilterListSource = async (opt: string) => {
+	const source: FilterListSource = {
+		type: SourceType.FilterList,
+		filters: '',
+		url: opt,
+	};
+
+	const response = await got(opt, {
+		headers: {
+			'user-agent': '@ghostery/testing-stage',
+		},
+		followRedirect: true,
+	});
+
+	source.filters = response.body;
+
+	console.log(`sources: loaded filter list path=${opt}`);
 
 	return source;
 };
@@ -73,11 +101,15 @@ export const getSources = async (text: Config['sources'], delimiter = ','): Prom
 			continue;
 		}
 
-		const protocol = line.slice(0, protocolEndsAt) as SourceType;
+		const protocol = line.slice(0, protocolEndsAt);
+		const opt = line.slice(protocolEndsAt + 3 /* '://'.length */);
 
-		if (protocol === SourceType.TrackerDb) {
+		if (protocol === 'trackerdb') {
 			// eslint-disable-next-line no-await-in-loop
-			sources.push(await getTrackerDbSource(line.slice(protocolEndsAt + 3 /* '://'.length */)));
+			sources.push(await getTrackerDbSource(opt));
+		} else if (protocol === 'http' || protocol === 'https') {
+			// eslint-disable-next-line no-await-in-loop
+			sources.push(await getFilterListSource(opt));
 		}
 	}
 

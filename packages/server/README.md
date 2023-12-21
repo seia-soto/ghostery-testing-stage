@@ -64,11 +64,10 @@ Sets the port for application to bind on.
 Sets the sources to build.
 You can specify supported sources in URL schema.
 
-Supported protocols are the followings:
-
-```sh
-trackerdb://path
-```
+| Type        | Protocol    | Example                         | Watch mode    |
+|-------------|-------------|---------------------------------|---------------|
+| TrackerDB   | trackerdb   | `trackerdb://path/to/trackerdb` | ✅ Supported   |
+| Filter list | http, https | `https://domain.tld/filter.txt` | ❌ Unsupported |
 
 **WATCH**
 
