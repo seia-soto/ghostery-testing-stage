@@ -2,7 +2,7 @@
 
 `server` exports compiled [`adblocker engine`](https://github.com/ghostery/adblocker) by watching TrackerDB definition files and local filter lists.
 
-# Usage
+## Usage
 
 ```
 pnpm start [options]
@@ -35,7 +35,7 @@ pnpm bundle
 pnpm standalone
 ```
 
-## Configuration via Environment Variables
+### Configuration via Environment Variables
 
 The command line interface of this project is a simple wrapper allowing environment variables to be set via arguments.
 You can skip specifying arguments by setting environment variables.
@@ -78,9 +78,9 @@ trackerdb://path
 The server will watch local sources if the variable has a length.
 For example, this value will be evaluated to `false` if you leave this variable empty.
 
-## API
+### API
 
-### GET `/api/filters.txt`
+#### GET `/api/filters.txt`
 
 Exposes registered filters in text format.
 Note that the output of this endpoint doesn't take any post-processing from TrackerDB and filter lists.
@@ -93,6 +93,6 @@ Note that the output of this endpoint doesn't take any post-processing from Trac
 {filter content}
 ```
 
-### GET `/api/engine.bytes`
+#### GET `/api/engine.bytes`
 
 Exposes compiled `FiltersEngine` of `@ghostery/adblocker` package.
