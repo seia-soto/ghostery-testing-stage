@@ -1,52 +1,33 @@
-import {Type, type Static} from '@sinclair/typebox';
+import {type Static, Type} from '@sinclair/typebox';
 import {TypeCompiler} from '@sinclair/typebox/compiler';
-import {numeric} from './typebox-extended';
+import * as yaml from 'yaml';
 
 export const configSchema = Type.Object({
 	bind: Type.Object({
-		address: Type.String(),
-		port: Type.String({format: numeric}),
+		host: Type.String(),
+		port: Type.Number(),
 	}),
-	sources: Type.String(),
-	watch: Type.String(),
+	sources: Type.Array(Type.Object({
+		type: Type.String(),
+		url: Type.String(),
+	})),
 });
+
+// eslint-disable-next-line new-cap
+export const configType = TypeCompiler.Compile(configSchema);
 
 export type Config = Static<typeof configSchema>;
 
-// eslint-disable-next-line new-cap
-const checker = TypeCompiler.Compile(configSchema);
-
-/**
- * Returns config object respecting environmental variables
- * @returns Config object candidate
- */
-export const getConfigFromEnv = () => ({
-	bind: {
-		address: process.env.BIND_ADDRESS ?? '127.0.0.1',
-		port: process.env.BIND_PORT ?? '8122',
-	},
-	sources: process.env.SOURCES ?? '',
-	watch: process.env.WATCH ?? '',
-});
-
-/**
- * Validates unknown object to be `Config` type
- * @param obj Config object to validate, `getConfigFromEnv` is used by default
- */
-export const getConfig = (obj = getConfigFromEnv()): Config => {
-	// eslint-disable-next-line new-cap
-	if (checker.Check(obj)) {
-		console.log('config: loaded', JSON.stringify(obj));
-
-		return obj;
-	}
+export const parseConfig = (source: string) => {
+	const candidate = yaml.parse(source) as unknown;
 
 	// eslint-disable-next-line new-cap
-	const errors = checker.Errors(obj);
+	if (!configType.Check(candidate)) {
+		// eslint-disable-next-line new-cap
+		const errors = configType.Errors(candidate);
 
-	for (const error of errors) {
-		console.error(`config: ${error.message} at ${error.path} but saw`, error.value);
+		return [false, errors] as const;
 	}
 
-	throw new Error('Failed to validate config object!');
+	return [true, candidate] as const;
 };

@@ -7,7 +7,7 @@
     "node": ">=20.10.0"
   },
   "scripts": {
-    "start": "NODE_OPTIONS='--import=tsx' node ./src/bin.ts",
+    "dev": "NODE_OPTIONS='--import=tsx' node ./src/entrypoints/dev.ts",
     "test": "NODE_OPTIONS='--import=tsx' ava",
     "bundle": "node scripts/bundle.cjs",
     "standalone": "pkg --no-native-build ."
@@ -50,6 +50,9 @@
     "chokidar": "^3.5.3",
     "fastify": "^4.25.1",
     "fastify-plugin": "^4.5.1",
-    "got": "^14.0.0"
+    "got": "^14.0.0",
+    "pino": "^8.17.1",
+    "pino-pretty": "^10.3.0",
+    "yaml": "^2.3.4"
   }
 }

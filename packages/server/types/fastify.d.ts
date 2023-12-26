@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/consistent-type-definitions */
 import {type Config} from '../src/modules/config';
-import {type EngineContext} from '../src/plugins/engine-manager';
 
+/* eslint-disable @typescript-eslint/consistent-type-definitions */
 declare module 'fastify' {
-	export interface FastifyInstance {
+	interface FastifyInstance {
 		config: Config;
-		engineManager: EngineContext;
 	}
 }

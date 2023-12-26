@@ -1,11 +1,20 @@
-import {createServer} from './server';
+import fastify from 'fastify';
+import {configPlugin} from './plugins/config';
 
-(async () => {
-	const server = await createServer();
-	const addr = await server.listen({
-		host: server.config.bind.address,
-		port: parseInt(server.config.bind.port, 10),
+export const createServer = async () => {
+	const server = fastify({
+		logger: {
+			transport: {
+				target: 'pino-pretty',
+				options: {
+					translateTime: 'HH:MM:ss Z',
+					ignore: 'pid,hostname',
+				},
+			},
+		},
 	});
 
-	console.log('server: listening on', addr);
-})();
+	await server.register(configPlugin);
+
+	return server;
+};
