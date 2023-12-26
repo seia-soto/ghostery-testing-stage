@@ -1,11 +1,7 @@
 export enum SourceType {
 	TrackerDB = 'trackerdb',
+	File = 'file',
 }
-
-export type SourceWatcher = {
-	files: Array<readonly [string, string]>;
-	isActive: boolean;
-};
 
 export type BaseSource = {
 	type: SourceType;
@@ -16,7 +12,11 @@ export type BaseSource = {
 
 export type TrackerDb = BaseSource & {
 	type: SourceType.TrackerDB;
-	watcher: SourceWatcher;
+	files: Array<readonly [string, string]>;
 };
 
-export type Source = TrackerDb;
+export type FileSource = BaseSource & {
+	type: SourceType.File;
+};
+
+export type Source = TrackerDb | FileSource;

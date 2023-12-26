@@ -1,5 +1,6 @@
 import {type FastifyInstance} from 'fastify';
 import {SourceType} from './sources/aatypes';
+import {initialiseFileSource, watchFileSource} from './sources/file';
 import {initialiseTrackerDb, watchTrackerDb} from './sources/trackerdb';
 
 const initSources = async (server: FastifyInstance) => {
@@ -8,8 +9,10 @@ const initSources = async (server: FastifyInstance) => {
 
 		if (source.type === SourceType.TrackerDB) {
 			await initialiseTrackerDb(source);
-
-			watchTrackerDb(source);
+			await watchTrackerDb(source);
+		} else if (source.type === SourceType.File) {
+			await initialiseFileSource(source);
+			await watchFileSource(source);
 		}
 	}
 };

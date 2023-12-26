@@ -1,8 +1,9 @@
 import {type FastifyPluginAsync} from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 import {SourceType, type Source} from '../modules/sources/aatypes';
-import {configContextRef} from './config';
+import {prepareFileSource} from '../modules/sources/file';
 import {prepareTrackerDb} from '../modules/sources/trackerdb';
+import {configContextRef} from './config';
 
 export type SourcesPluginContext = {
 	sources: Source[];
@@ -48,28 +49,30 @@ const plugin: FastifyPluginAsync = async server => {
 		updatedAt: 0,
 	};
 
+	const makeProxy = (source: Source) => new Proxy(source, {
+		set(target, p, newValue, receiver) {
+			Reflect.set(target, p, newValue, receiver);
+
+			if (p !== 'filters') {
+				return true;
+			}
+
+			server.log.info({scope: 'plugin:sources'}, 'rebuilding filters');
+
+			context.updatedAt = Date.now();
+			context.filters = buildFilters(context.sources, context.updatedAt.toString());
+
+			return true;
+		},
+	});
+
 	for (const source of server.config.sources) {
 		const type = source.type as SourceType;
 
 		if (type === SourceType.TrackerDB) {
-			const item = new Proxy(prepareTrackerDb(source.url), {
-				set(target, p, newValue, receiver) {
-					Reflect.set(target, p, newValue, receiver);
-
-					if (p !== 'filters') {
-						return true;
-					}
-
-					server.log.info({scope: 'plugin:sources'}, 'rebuilding filters');
-
-					context.updatedAt = Date.now();
-					context.filters = buildFilters(context.sources, context.updatedAt.toString());
-
-					return true;
-				},
-			});
-
-			context.sources.push(item);
+			context.sources.push(makeProxy(prepareTrackerDb(source.url)));
+		} else if (type === SourceType.File) {
+			context.sources.push(makeProxy(prepareFileSource(source.url)));
 		}
 	}
 
