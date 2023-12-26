@@ -31,5 +31,6 @@ module.exports = {
 		sourceType: 'module',
 	},
 	rules: {
+		'no-await-in-loop': 0,
 	},
 };

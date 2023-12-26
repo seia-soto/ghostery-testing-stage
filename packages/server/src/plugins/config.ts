@@ -5,12 +5,12 @@ import {readFile, stat} from 'fs/promises';
 import path from 'path';
 import {parseConfig} from '../modules/config';
 
-const ref = 'config';
+export const configContextRef = 'config';
 
 const plugin: FastifyPluginAsync = async server => {
 	server.log.info({scope: 'plugin:config'}, 'loading');
 
-	if (server.hasDecorator(ref)) {
+	if (server.hasDecorator(configContextRef)) {
 		server.log.warn({scope: 'plugin:config'}, 'decorator already declared');
 
 		return;
@@ -42,9 +42,9 @@ const plugin: FastifyPluginAsync = async server => {
 		process.exit(1);
 	}
 
-	server.decorate(ref, data);
+	server.decorate(configContextRef, data);
 
-	server.log.info({scope: 'plugin:config'}, 'done');
+	server.log.info({scope: 'plugin:config', config: data}, 'loaded');
 };
 
 export const configPlugin = fastifyPlugin(plugin, {
