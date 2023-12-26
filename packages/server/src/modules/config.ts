@@ -18,6 +18,11 @@ export const configType = TypeCompiler.Compile(configSchema);
 
 export type Config = Static<typeof configSchema>;
 
+/**
+ * Parse and validate config file.
+ * @param source The content of yaml config file.
+ * @returns An array consisted of status and config or config related error data.
+ */
 export const parseConfig = (source: string) => {
 	const candidate = yaml.parse(source) as unknown;
 
