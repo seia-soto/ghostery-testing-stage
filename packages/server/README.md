@@ -10,7 +10,7 @@ Install dependencies:
 pnpm install
 ```
 
-Create `tss-config.yaml` on the working directory and add your sources.
+Create `tss-config.ya?ml` on the working directory and add your sources.
 
 ```yaml
 bind:
