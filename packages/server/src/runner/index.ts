@@ -7,6 +7,7 @@ const entrypoint = async () => {
 		config,
 		features: {
 			enableLogging: true,
+			enableWatching: true,
 		},
 	});
 

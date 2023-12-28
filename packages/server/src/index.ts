@@ -10,12 +10,16 @@ export type ServerOptions = {
 	config: unknown;
 	features?: {
 		enableLogging?: boolean;
+		enableWatching?: boolean;
 	};
 };
 
 export const createServer = async ({
 	config,
-	features = {},
+	features = {
+		enableLogging: true,
+		enableWatching: true,
+	},
 }: ServerOptions) => {
 	const server = fastify({
 		logger: features.enableLogging
@@ -31,6 +35,8 @@ export const createServer = async ({
 			: true,
 	})
 		.setValidatorCompiler(TypeBoxValidatorCompiler);
+
+	server.decorate('features', features);
 
 	await server.register(configPlugin, {config});
 	await server.register(sourcesPlugin, {sources: server.config.sources});

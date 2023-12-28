@@ -1,3 +1,4 @@
+import {type ServerOptions} from '../src';
 import {type Config} from '../src/modules/config';
 import {type SourcesPluginContext} from '../src/plugins/sources';
 
@@ -5,6 +6,7 @@ import {type SourcesPluginContext} from '../src/plugins/sources';
 declare module 'fastify' {
 	interface FastifyInstance {
 		config: Config;
+		features: ServerOptions['features'];
 		sources: SourcesPluginContext;
 	}
 }

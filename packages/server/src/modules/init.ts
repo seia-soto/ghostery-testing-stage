@@ -9,10 +9,18 @@ const initSources = async (server: FastifyInstance) => {
 
 		if (source.type === SourceType.TrackerDB) {
 			await initialiseTrackerDb(source);
-			await watchTrackerDb(source);
 		} else if (source.type === SourceType.File) {
 			await initialiseFileSource(source);
-			await watchFileSource(source);
+		}
+	}
+
+	if (server.features?.enableWatching) {
+		for (const source of server.sources.sources) {
+			if (source.type === SourceType.TrackerDB) {
+				await watchTrackerDb(source);
+			} else if (source.type === SourceType.File) {
+				await watchFileSource(source);
+			}
 		}
 	}
 };
