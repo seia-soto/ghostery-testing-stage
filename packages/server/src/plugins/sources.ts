@@ -1,3 +1,4 @@
+import EventEmitter from 'eventemitter3';
 import {type FastifyPluginAsync} from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 import {SourceType, type Source} from '../modules/sources/aatypes';
@@ -9,6 +10,7 @@ export type SourcesPluginContext = {
 	sources: Source[];
 	filters: string;
 	updatedAt: number;
+	events: EventEmitter;
 };
 
 const sourcesContextRef = 'sources';
@@ -47,6 +49,7 @@ const plugin: FastifyPluginAsync = async server => {
 		sources: [],
 		filters: '',
 		updatedAt: 0,
+		events: new EventEmitter(),
 	};
 
 	const makeProxy = (source: Source) => new Proxy(source, {
@@ -61,6 +64,8 @@ const plugin: FastifyPluginAsync = async server => {
 
 			context.updatedAt = Date.now();
 			context.filters = buildFilters(context.sources, context.updatedAt.toString());
+
+			context.events.emit('filters:update');
 
 			return true;
 		},

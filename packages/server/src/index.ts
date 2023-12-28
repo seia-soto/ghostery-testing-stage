@@ -1,3 +1,5 @@
+import {TypeBoxValidatorCompiler} from '@fastify/type-provider-typebox';
+import fastifyWebsocket from '@fastify/websocket';
 import fastify from 'fastify';
 import {init} from './modules/init';
 import {configPlugin} from './plugins/config';
@@ -15,14 +17,16 @@ export const createServer = async () => {
 				},
 			},
 		},
-	});
+	})
+		.setValidatorCompiler(TypeBoxValidatorCompiler);
 
 	await server.register(configPlugin);
 	await server.register(sourcesPlugin);
 
-	await init(server);
-
+	await server.register(fastifyWebsocket);
 	await server.register(router);
+
+	await init(server);
 
 	return server;
 };
