@@ -7,7 +7,7 @@
     "node": ">=20.10.0"
   },
   "scripts": {
-    "dev": "NODE_OPTIONS='--import=tsx' node ./src/entrypoints/dev.ts",
+    "start": "NODE_OPTIONS='--import=tsx' node ./src/runner/index.ts",
     "test": "NODE_OPTIONS='--import=tsx' ava",
     "bundle": "node scripts/bundle.cjs",
     "standalone": "pkg --no-native-build ."

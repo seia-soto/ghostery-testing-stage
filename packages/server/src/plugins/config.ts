@@ -1,13 +1,14 @@
 import {type FastifyPluginAsync} from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
-import {existsSync} from 'fs';
-import {readFile, stat} from 'fs/promises';
-import path from 'path';
-import {parseConfig} from '../modules/config';
+import {validateConfig} from '../modules/config';
 
 export const configContextRef = 'config';
 
-const plugin: FastifyPluginAsync = async server => {
+export type ConfigPluginOptions = {
+	config: unknown;
+};
+
+const plugin: FastifyPluginAsync<ConfigPluginOptions> = async (server, {config}) => {
 	server.log.info({scope: 'plugin:config'}, 'loading');
 
 	if (server.hasDecorator(configContextRef)) {
@@ -16,23 +17,7 @@ const plugin: FastifyPluginAsync = async server => {
 		return;
 	}
 
-	let configPath = path.join(process.cwd(), 'tss-config.yaml');
-
-	if (process.env.TSS_CONFIG) {
-		configPath = process.env.TSS_CONFIG;
-	}
-
-	if (
-		!existsSync(configPath)
-    || !(await stat(configPath)).isFile()
-	) {
-		server.log.error({scope: 'plugin:config', configPath}, 'file not found');
-
-		process.exit(1);
-	}
-
-	const source = await readFile(configPath, 'utf8');
-	const [success, data] = parseConfig(source);
+	const [success, data] = validateConfig(config);
 
 	if (!success) {
 		for (const error of data) {

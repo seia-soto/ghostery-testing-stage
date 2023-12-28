@@ -6,22 +6,34 @@ import {configPlugin} from './plugins/config';
 import {sourcesPlugin} from './plugins/sources';
 import {router} from './routes';
 
-export const createServer = async () => {
+export type ServerOptions = {
+	config: unknown;
+	features?: {
+		enableLogging?: boolean;
+	};
+};
+
+export const createServer = async ({
+	config,
+	features = {},
+}: ServerOptions) => {
 	const server = fastify({
-		logger: {
-			transport: {
-				target: 'pino-pretty',
-				options: {
-					translateTime: 'HH:MM:ss Z',
-					ignore: 'pid,hostname',
+		logger: features.enableLogging
+			? {
+				transport: {
+					target: 'pino-pretty',
+					options: {
+						translateTime: 'HH:MM:ss Z',
+						ignore: 'pid,hostname',
+					},
 				},
-			},
-		},
+			}
+			: true,
 	})
 		.setValidatorCompiler(TypeBoxValidatorCompiler);
 
-	await server.register(configPlugin);
-	await server.register(sourcesPlugin);
+	await server.register(configPlugin, {config});
+	await server.register(sourcesPlugin, {sources: server.config.sources});
 
 	await server.register(fastifyWebsocket);
 	await server.register(router);

@@ -1,16 +1,20 @@
 import EventEmitter from 'eventemitter3';
 import {type FastifyPluginAsync} from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
+import {type Config} from '../modules/config';
 import {SourceType, type Source} from '../modules/sources/aatypes';
 import {prepareFileSource} from '../modules/sources/file';
 import {prepareTrackerDb} from '../modules/sources/trackerdb';
-import {configContextRef} from './config';
 
 export type SourcesPluginContext = {
 	sources: Source[];
 	filters: string;
 	updatedAt: number;
 	events: EventEmitter;
+};
+
+export type SourcesPluginOptions = {
+	sources: Config['sources'];
 };
 
 const sourcesContextRef = 'sources';
@@ -30,14 +34,8 @@ ${source.filters}
 	return filters;
 };
 
-const plugin: FastifyPluginAsync = async server => {
+const plugin: FastifyPluginAsync<SourcesPluginOptions> = async (server, {sources = []}) => {
 	server.log.info({scope: 'plugin:sources'}, 'loading');
-
-	if (!server.hasDecorator(configContextRef)) {
-		server.log.warn({scope: 'plugin:sources'}, '`configPlugin` should be preloaded');
-
-		return;
-	}
 
 	if (server.hasDecorator(sourcesContextRef)) {
 		server.log.warn({scope: 'plugin:sources'}, 'decorator already declared');
@@ -71,7 +69,7 @@ const plugin: FastifyPluginAsync = async server => {
 		},
 	});
 
-	for (const source of server.config.sources) {
+	for (const source of sources) {
 		const type = source.type as SourceType;
 
 		if (type === SourceType.TrackerDB) {

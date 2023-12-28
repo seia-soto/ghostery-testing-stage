@@ -1,6 +1,5 @@
-import {type Static, Type} from '@sinclair/typebox';
+import {Type, type Static} from '@sinclair/typebox';
 import {TypeCompiler} from '@sinclair/typebox/compiler';
-import * as yaml from 'yaml';
 
 export const configSchema = Type.Object({
 	bind: Type.Object({
@@ -20,12 +19,10 @@ export type Config = Static<typeof configSchema>;
 
 /**
  * Parse and validate config file.
- * @param source The content of yaml config file.
+ * @param candidate The candidate config object before validation.
  * @returns An array consisted of status and config or config related error data.
  */
-export const parseConfig = (source: string) => {
-	const candidate = yaml.parse(source) as unknown;
-
+export const validateConfig = (candidate: unknown) => {
 	// eslint-disable-next-line new-cap
 	if (!configType.Check(candidate)) {
 		// eslint-disable-next-line new-cap
