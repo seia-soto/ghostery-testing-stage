@@ -3,21 +3,37 @@ import {readFile, stat} from 'fs/promises';
 import path from 'path';
 import * as yaml from 'yaml';
 
-export const readConfig = async () => {
-	let configPath = path.join(process.cwd(), 'tss-config.yaml');
+const isFile = async (location: string) => {
+	if (!existsSync(location)) {
+		return false;
+	}
 
+	return (await stat(location)).isFile();
+};
+
+const findConfig = async () => {
 	if (process.env.TSS_CONFIG) {
-		configPath = process.env.TSS_CONFIG;
+		return process.env.TSS_CONFIG;
 	}
 
-	if (
-		!existsSync(configPath)
-    || !(await stat(configPath)).isFile()
-	) {
-		throw new Error('Configuration file was not found!');
+	const cwd = process.cwd();
+	let location = path.join(cwd, 'tss-config.yaml');
+
+	if (await isFile(location)) {
+		return location;
 	}
 
-	const source = await readFile(configPath, 'utf8');
+	location = path.join(cwd, 'tss-config.yml');
+
+	if (await isFile(location)) {
+		return location;
+	}
+
+	throw new Error('config: failed to find the location of config file!');
+};
+
+export const readConfig = async () => {
+	const source = await readFile(await findConfig(), 'utf8');
 
 	return yaml.parse(source) as unknown;
 };
