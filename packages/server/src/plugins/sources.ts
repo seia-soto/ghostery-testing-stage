@@ -34,6 +34,20 @@ ${source.filters}
 	return filters;
 };
 
+const hookFiltersSetter = (source: Source, deferredFn: () => unknown) => new Proxy(source, {
+	set(target, p, newValue, receiver) {
+		Reflect.set(target, p, newValue, receiver);
+
+		if (p !== 'filters') {
+			return true;
+		}
+
+		process.nextTick(deferredFn);
+
+		return true;
+	},
+});
+
 const plugin: FastifyPluginAsync<SourcesPluginOptions> = async (server, {sources = []}) => {
 	server.log.info({scope: 'plugin:sources'}, 'loading');
 
@@ -50,32 +64,22 @@ const plugin: FastifyPluginAsync<SourcesPluginOptions> = async (server, {sources
 		events: new EventEmitter(),
 	};
 
-	const makeProxy = (source: Source) => new Proxy(source, {
-		set(target, p, newValue, receiver) {
-			Reflect.set(target, p, newValue, receiver);
+	const deferred = () => {
+		server.log.info({scope: 'plugin:sources'}, 'rebuilding filters');
 
-			if (p !== 'filters') {
-				return true;
-			}
+		context.updatedAt = Date.now();
+		context.filters = buildFilters(context.sources, context.updatedAt.toString());
 
-			server.log.info({scope: 'plugin:sources'}, 'rebuilding filters');
-
-			context.updatedAt = Date.now();
-			context.filters = buildFilters(context.sources, context.updatedAt.toString());
-
-			context.events.emit('filters:update');
-
-			return true;
-		},
-	});
+		context.events.emit('filters:update');
+	};
 
 	for (const source of sources) {
 		const type = source.type as SourceType;
 
 		if (type === SourceType.TrackerDB) {
-			context.sources.push(makeProxy(prepareTrackerDb(source.url)));
+			context.sources.push(hookFiltersSetter(prepareTrackerDb(source.url), deferred));
 		} else if (type === SourceType.File) {
-			context.sources.push(makeProxy(prepareFileSource(source.url)));
+			context.sources.push(hookFiltersSetter(prepareFileSource(source.url), deferred));
 		}
 	}
 
