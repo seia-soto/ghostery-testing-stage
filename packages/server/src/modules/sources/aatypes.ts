@@ -7,7 +7,6 @@ export type BaseSource = {
 	type: SourceType;
 	url: string;
 	filters: string;
-	isInitialised: boolean;
 };
 
 export type TrackerDb = BaseSource & {

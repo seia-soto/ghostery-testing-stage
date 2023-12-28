@@ -9,7 +9,6 @@ export const prepareTrackerDb = (url: string): TrackerDb => ({
 	url,
 	filters: '',
 	files: [],
-	isInitialised: false,
 });
 
 export const initialiseTrackerDb = async (source: TrackerDb) => {
@@ -25,8 +24,6 @@ export const initialiseTrackerDb = async (source: TrackerDb) => {
 
 	source.filters = files.map(file => file[1]).join('\n');
 	source.files = files;
-
-	source.isInitialised = true;
 };
 
 export const watchTrackerDb = async (source: TrackerDb) => {

@@ -7,7 +7,6 @@ export const prepareFileSource = (url: string): FileSource => ({
 	type: SourceType.File,
 	url,
 	filters: '',
-	isInitialised: false,
 });
 
 export const initialiseFileSource = async (source: FileSource) => {
@@ -20,7 +19,6 @@ export const initialiseFileSource = async (source: FileSource) => {
 	}
 
 	source.filters = await readFile(source.url, 'utf8');
-	source.isInitialised = true;
 };
 
 export const watchFileSource = async (source: FileSource) => {
