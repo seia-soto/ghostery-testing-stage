@@ -1,4 +1,6 @@
 bind:
   host: localhost
   port: 8122
-sources: []
+sources:
+  - type: trackerdb
+    url: /Users/aa/local/repos/trackerdb
