@@ -33,11 +33,26 @@ importers:
       '@types/webextension-polyfill':
         specifier: ^0.10.6
         version: 0.10.7
+      '@typescript-eslint/eslint-plugin':
+        specifier: '>=6.0.0'
+        version: 6.15.0(@typescript-eslint/parser@6.15.0)(eslint@8.56.0)(typescript@5.3.3)
+      '@typescript-eslint/parser':
+        specifier: '>=6.0.0'
+        version: 6.15.0(eslint@8.56.0)(typescript@5.3.3)
       '@vitejs/plugin-react':
         specifier: ^4.2.0
         version: 4.2.1(vite@5.0.10)
+      eslint:
+        specifier: '>=8.0.0'
+        version: 8.56.0
+      eslint-config-xo:
+        specifier: ^0.43.1
+        version: 0.43.1(eslint@8.56.0)
+      eslint-config-xo-typescript:
+        specifier: ^1.0.1
+        version: 1.0.1(@typescript-eslint/eslint-plugin@6.15.0)(@typescript-eslint/parser@6.15.0)(eslint@8.56.0)(typescript@5.3.3)
       typescript:
-        specifier: ^5.2.2
+        specifier: ^5.3.3
         version: 5.3.3
       vite:
         specifier: ^5.0.0

@@ -1,15 +1,10 @@
-import pkg from "../package.json";
+import pkg from '../package.json';
 
-const manifest = {
-  permissions: ["*://*/*"],
+export const manifest: chrome.runtime.ManifestV2 = {
+	author: pkg.author,
+	name: pkg.displayName ?? pkg.name,
+	version: pkg.version,
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	manifest_version: 2,
+	permissions: ['*://*/*'],
 };
-
-export function getManifest(): chrome.runtime.ManifestV2 {
-  return {
-    author: pkg.author,
-    name: pkg.displayName ?? pkg.name,
-    version: pkg.version,
-    manifest_version: 2,
-    ...manifest,
-  };
-}
